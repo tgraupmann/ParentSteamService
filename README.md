@@ -90,7 +90,7 @@ if (isset($_GET['computer'])) {
 ?>
 ```
 
-The following sample `PHP` can cause the service to reboot the computer when `yes` is returned.
+The following sample `PHP` can cause the service to reboot the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
 ```
 <?php
 
@@ -106,16 +106,20 @@ if (isset($_GET['computer'])) {
     $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
     fwrite($myfile, $txt);
     fclose($myfile);
+    echo ($txt);
   } else {
+    // read file
     $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
     $contents = fread($myfile,filesize($file));
     fclose($myfile);
-    include $file;
-    if ($contents == 'yes') {
-      $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
-      fwrite($myfile, $txt);
-      fclose($myfile);
-    }
+
+    // print contents
+    echo ($contents);
+
+    // reset file
+    $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
+    fwrite($myfile, $txt);
+    fclose($myfile);
   }
 } else {
   echo ($txt);
