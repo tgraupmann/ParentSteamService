@@ -121,5 +121,4 @@ if (isset($_GET['computer'])) {
   echo ($txt);
 }
 ?>
-
 ```

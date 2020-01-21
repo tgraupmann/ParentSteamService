@@ -150,7 +150,7 @@ namespace ParentSteamService
                     {
                         using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                         {
-                            if (sr.ReadToEnd() == "yes")
+                            if (sr.ReadToEnd().Trim().ToLower() == "yes")
                             {
                                 System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
                             }
