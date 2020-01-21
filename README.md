@@ -72,3 +72,37 @@ if (isset($_GET['computer'])) {
 }
 ?>
 ```
+
+The following sample `PHP` can cause the service to reboot the computer when `yes` is returned.
+```
+<?php
+
+header("Content-Type: text/plain");
+
+$txt = "no";
+
+$computer = '';
+if (isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'reboot_' . basename($computer) . '.txt';
+  if (!file_exists($file)) {
+    $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
+    fwrite($myfile, $txt);
+    fclose($myfile);
+  } else {
+    $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+    $contents = fread($myfile,filesize($file));
+    fclose($myfile);
+    include $file;
+    if ($contents == 'yes') {
+      $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
+      fwrite($myfile, $txt);
+      fclose($myfile);
+    }
+  }
+} else {
+  echo ($txt);
+}
+?>
+
+```

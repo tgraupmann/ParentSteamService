@@ -108,30 +108,55 @@ namespace ParentSteamService
                 }
 
                 // no need to write updates that haven't changed
-                if (_mLastContent == content)
+                if (_mLastContent != content)
                 {
-                    continue;
-                }
-                // watch for changes
-                _mLastContent = content;
+                    // watch for changes
+                    _mLastContent = content;
 
-                // write the hosts changes
-                try
-                {
-                    if (!string.IsNullOrEmpty(content))
+                    // write the hosts changes
+                    try
                     {
-                        using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                        if (!string.IsNullOrEmpty(content))
                         {
-                            using (StreamWriter sw = new StreamWriter(fs))
+                            using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
                             {
-                                string contents = HEADER_HOSTS;
-                                sw.Write(contents);
-                                sw.WriteLine();
-                                sw.WriteLine("{0}", content);
-                                sw.Flush();
+                                using (StreamWriter sw = new StreamWriter(fs))
+                                {
+                                    string contents = HEADER_HOSTS;
+                                    sw.Write(contents);
+                                    sw.WriteLine();
+                                    sw.WriteLine("{0}", content);
+                                    sw.Flush();
+                                }
                             }
                         }
                     }
+                    catch
+                    {
+
+                    }
+                }
+
+                // check if reboot is needed
+
+                try
+                {
+                    string url = ConfigurationSettings.AppSettings["RebootUri"];
+                    string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
+                    Uri uri = new Uri(url + query);
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        {
+                            if (sr.ReadToEnd() == "yes")
+                            {
+                                System.Diagnostics.Process.Start("shutdown.exe", "-r -t 0");
+                            }
+                        }
+                    }
+                    response.Close();
                 }
                 catch
                 {
