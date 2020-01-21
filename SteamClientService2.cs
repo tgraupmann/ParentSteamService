@@ -57,11 +57,25 @@ namespace ParentSteamService
             _mWaitForExit = false;
         }
 
+        private void SafeSleep(uint milliseconds)
+        {
+            uint count = 0;
+            while (count < milliseconds)
+            {
+                if (!_mWaitForExit)
+                {
+                    return;
+                }
+                Thread.Sleep(1);
+                ++count;
+            }
+        }
+
         private void ThreadWorker()
         {
             while (_mWaitForExit)
             {
-                Thread.Sleep(3000);
+                SafeSleep(3000);
                 if (!_mWaitForExit)
                 {
                     break;
