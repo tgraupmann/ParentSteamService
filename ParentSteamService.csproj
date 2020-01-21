@@ -7,7 +7,7 @@
     <ProjectGuid>{86A59E96-2442-47B7-8B4F-514BF4E51778}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>ParentSteamService</RootNamespace>
-    <AssemblyName>ParentSteamService</AssemblyName>
+    <AssemblyName>SteamServiceMonitor</AssemblyName>
     <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
