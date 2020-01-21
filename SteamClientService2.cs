@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Configuration;
 using System.IO;
+using System.Net;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
@@ -38,6 +40,7 @@ namespace ParentSteamService
 
         private Thread _mThread = null;
         private bool _mWaitForExit = true;
+        private string _mLastContent = null;
 
         public SteamClientService2()
         {
@@ -80,15 +83,49 @@ namespace ParentSteamService
                 {
                     break;
                 }
+
+                // request the hosts URI to get hosts changes
+                string content = null;
                 try
                 {
-                    using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                    Uri uri = new Uri(ConfigurationSettings.AppSettings["HostsUri"]);
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        using (StreamWriter sw = new StreamWriter(fs))
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                         {
-                            string contents = HEADER_HOSTS;
-                            sw.Write(contents);
-                            sw.Flush();
+                            content = sr.ReadToEnd();
+                        }
+                    }
+                    response.Close();
+                }
+                catch
+                {
+
+                }
+
+                // no need to write updates that haven't changed
+                if (_mLastContent == content)
+                {
+                    continue;
+                }
+
+                // write the hosts changes
+                try
+                {
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                        {
+                            using (StreamWriter sw = new StreamWriter(fs))
+                            {
+                                string contents = HEADER_HOSTS;
+                                sw.Write(contents);
+                                sw.WriteLine();
+                                sw.WriteLine("{0}", content);
+                                sw.Flush();
+                            }
                         }
                     }
                 }

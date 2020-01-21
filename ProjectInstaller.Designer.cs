@@ -39,7 +39,7 @@
             // 
             // serviceInstaller1
             // 
-            this.serviceInstaller1.Description = "Steam Client Service for parents";
+            this.serviceInstaller1.Description = "Steam Client Service monitors and controls access for parents";
             this.serviceInstaller1.DisplayName = "Steam Client Service 2";
             this.serviceInstaller1.ServiceName = "Steam Client Service 2";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
