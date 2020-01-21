@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.ServiceProcess;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ServiceProcess;
 
 namespace ParentSteamService
 {
@@ -17,7 +12,7 @@ namespace ParentSteamService
             ServiceBase[] ServicesToRun;
             ServicesToRun = new ServiceBase[]
             {
-                new Service1()
+                new SteamClientService2()
             };
             ServiceBase.Run(ServicesToRun);
         }

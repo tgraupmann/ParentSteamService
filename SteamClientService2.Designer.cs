@@ -1,6 +1,6 @@
 ﻿namespace ParentSteamService
 {
-    partial class Service1
+    partial class SteamClientService2
     {
         /// <summary> 
         /// Required designer variable.
@@ -28,10 +28,22 @@
         /// </summary>
         private void InitializeComponent()
         {
-            components = new System.ComponentModel.Container();
-            this.ServiceName = "Service1";
+            this.components = new System.ComponentModel.Container();
+            this._mTimer1 = new System.Windows.Forms.Timer(this.components);
+            // 
+            // _mTimer1
+            // 
+            this._mTimer1.Interval = 3000;
+            this._mTimer1.Tick += new System.EventHandler(this._mTimer1_Tick);
+            // 
+            // SteamClientService2
+            // 
+            this.ServiceName = "SteamClientService2";
+
         }
 
         #endregion
+
+        private System.Windows.Forms.Timer _mTimer1;
     }
 }
