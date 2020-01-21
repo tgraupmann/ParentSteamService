@@ -33,7 +33,7 @@
             // 
             // serviceProcessInstaller1
             // 
-            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalService;
+            this.serviceProcessInstaller1.Account = System.ServiceProcess.ServiceAccount.LocalSystem;
             this.serviceProcessInstaller1.Password = null;
             this.serviceProcessInstaller1.Username = null;
             // 
@@ -41,7 +41,7 @@
             // 
             this.serviceInstaller1.Description = "Steam Client Service for parents";
             this.serviceInstaller1.DisplayName = "Steam Client Service 2";
-            this.serviceInstaller1.ServiceName = "SteamClientService2";
+            this.serviceInstaller1.ServiceName = "Steam Client Service 2";
             this.serviceInstaller1.StartType = System.ServiceProcess.ServiceStartMode.Automatic;
             // 
             // ProjectInstaller

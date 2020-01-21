@@ -2,6 +2,7 @@
 using System.IO;
 using System.ServiceProcess;
 using System.Text;
+using System.Threading;
 
 // ref: https://docs.microsoft.com/en-us/dotnet/framework/windows-services/walkthrough-creating-a-windows-service-application-in-the-component-designer
 
@@ -35,6 +36,9 @@ namespace ParentSteamService
 #	::1             localhost
 ";
 
+        private Thread _mThread = null;
+        private bool _mWaitForExit = true;
+
         public SteamClientService2()
         {
             InitializeComponent();
@@ -42,31 +46,42 @@ namespace ParentSteamService
 
         protected override void OnStart(string[] args)
         {
-            _mTimer1.Start();
+            _mWaitForExit = true;
+            ThreadStart ts = new ThreadStart(ThreadWorker);
+            _mThread = new Thread(ts);
+            _mThread.Start();
         }
 
         protected override void OnStop()
         {
-            _mTimer1.Stop();
+            _mWaitForExit = false;
         }
 
-        private void _mTimer1_Tick(object sender, EventArgs e)
+        private void ThreadWorker()
         {
-            try
+            while (_mWaitForExit)
             {
-                using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
+                Thread.Sleep(3000);
+                if (!_mWaitForExit)
                 {
-                    using (StreamWriter sw = new StreamWriter(fs))
+                    break;
+                }
+                try
+                {
+                    using (FileStream fs = File.Open(FILE_HOSTS, FileMode.OpenOrCreate, FileAccess.Write, FileShare.ReadWrite))
                     {
-                        string contents = HEADER_HOSTS;
-                        sw.Write(contents);
-                        sw.Flush();
+                        using (StreamWriter sw = new StreamWriter(fs))
+                        {
+                            string contents = HEADER_HOSTS;
+                            sw.Write(contents);
+                            sw.Flush();
+                        }
                     }
                 }
-            }
-            catch
-            {
+                catch
+                {
 
+                }
             }
         }
     }
