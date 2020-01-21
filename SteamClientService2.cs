@@ -3,8 +3,8 @@ using System.Configuration;
 using System.IO;
 using System.Net;
 using System.ServiceProcess;
-using System.Text;
 using System.Threading;
+using System.Web;
 
 // ref: https://docs.microsoft.com/en-us/dotnet/framework/windows-services/walkthrough-creating-a-windows-service-application-in-the-component-designer
 
@@ -88,7 +88,9 @@ namespace ParentSteamService
                 string content = null;
                 try
                 {
-                    Uri uri = new Uri(ConfigurationSettings.AppSettings["HostsUri"]);
+                    string url = ConfigurationSettings.AppSettings["HostsUri"];
+                    string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
+                    Uri uri = new Uri(url + query);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -110,6 +112,8 @@ namespace ParentSteamService
                 {
                     continue;
                 }
+                // watch for changes
+                _mLastContent = content;
 
                 // write the hosts changes
                 try
