@@ -32,7 +32,24 @@ When the service is running, the task manager will show a process `SteamServiceM
 
 ## Configuration
 
-The `HostsUri` configuration setting uses a path to a URL which controls the contents of the system `HOSTS` file.
+The `HostsUri` configuration setting monitors the contents of a URL which controls the contents of the system `HOSTS` file.
+
+The `RebootUri` configuration setting monitors the contents a URL which can reboot the machine.
+
+Sample `App.config`:
+
+```
+<?xml version="1.0" encoding="utf-8" ?>
+<configuration>
+    <startup>
+        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
+    </startup>
+  <appSettings>
+    <add key="HostsUri" value="https://[your_domain_here]/path/to/hosts.php" />
+    <add key="RebootUri" value="https://[your_domain_here]/path/to/reboot.php" />
+  </appSettings>
+</configuration>
+```
 
 ### Sample PHP JavaScript
 
