@@ -55,6 +55,7 @@ Sample `App.config`:
 
 The following sample `PHP` allows the user to control hosts configurations per machine using the `?computer=` query parameter to select the contents that the service uses.
 
+`hosts.php`
 ```
 <?php
 
@@ -91,6 +92,8 @@ if (isset($_GET['computer'])) {
 ```
 
 The following sample `PHP` can cause the service to reboot the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
+
+`reboot.php`
 ```
 <?php
 
@@ -125,4 +128,42 @@ if (isset($_GET['computer'])) {
   echo ($txt);
 }
 ?>
+```
+
+The following sample `PHP` provides a remote reboot button for each detected computer.
+
+`manage.php`
+```
+<h1>Steam Service Management</h1>
+
+<?php
+
+if (isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'reboot_' . basename($computer) . '.txt';
+  $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
+  fwrite($myfile, 'yes');
+  fclose($myfile);
+}
+
+?>
+<html>
+<head>
+<script>
+function rebootComputer(computer) {
+  if (confirm('Are you sure you want to reboot ' + computer + '?')) {
+    window.location.href = 'manage.php?computer=' + computer;
+  }
+}
+</script>
+</head>
+<?php
+foreach (glob("contents_*.txt") as $filename) {
+    $prefix = 'contents_';
+    $suffix = '.txt';
+    $entry = substr($filename, strlen($prefix), strlen($filename) - strlen($prefix) - strlen($suffix));
+    echo ('<button style="width: 250px; height=60px; padding:25px; margin:35px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button> <wbr/>');
+}
+?>
+</html>
 ```
