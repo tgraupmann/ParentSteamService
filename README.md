@@ -162,7 +162,19 @@ foreach (glob("contents_*.txt") as $filename) {
     $prefix = 'contents_';
     $suffix = '.txt';
     $entry = substr($filename, strlen($prefix), strlen($filename) - strlen($prefix) - strlen($suffix));
-    echo ('<button style="width: 250px; height=60px; padding:25px; margin:35px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button> <wbr/>');
+
+    $file = 'description_' . basename($entry) . '.txt';
+    if (!file_exists($file)) {
+      $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
+      fwrite($myfile, 'Unknown');
+      fclose($myfile);
+    }
+
+    echo ('<div style="display: inline-table; text-align: center; border: solid black; margin: 25px; padding: 20px;">');
+    include "$file";
+    echo ('<br/>');
+
+    echo ('<button style="width: 250px; height=60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button></div> <wbr/>');
 }
 ?>
 </html>
