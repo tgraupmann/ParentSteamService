@@ -174,7 +174,7 @@ foreach (glob("contents_*.txt") as $filename) {
     include "$file";
     echo ('<br/>');
 
-    echo ('<button style="width: 250px; height=60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button></div> <wbr/>');
+    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button></div> <wbr/>');
 }
 ?>
 </html>
