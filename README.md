@@ -8,6 +8,18 @@ The service checks a URL for hosts changes on an interval. When a change is dete
 
 Browsers typically need to be restarted after changing the HOSTS file, in order to take effect.
 
+`manage.php`
+
+![image_3](images/image_3.png)
+
+`hosts.php`
+
+![image_4](images/image_4.png)
+
+`reboot.php`
+
+![image_5](images/image_5.png)
+
 ## Setup
 
 To install, open a Visual Studio Command Prompt.
