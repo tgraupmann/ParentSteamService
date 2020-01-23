@@ -77,15 +77,33 @@ $txt = "#blocked domains:
 $computer = '';
 if (isset($_GET['computer'])) {
   $computer = $_GET['computer'];
+
+  // read file
+  $locked = 'no';
+  $file = 'lock_' . basename($computer) . '.txt';
+  if (file_exists($file)) {
+    $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+    $locked = fread($myfile,filesize($file));
+    fclose($myfile);
+  }
+
   $file = 'contents_' . basename($computer) . '.txt';
   if (!file_exists($file)) {
     $myfile = fopen($file, 'w') or die("Unable to open file!");
     fwrite($myfile, $txt);
     fclose($myfile);
   } else {
-    include $file;
+    $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+    $content = fread($myfile,filesize($file));
+    fclose($myfile);
+
+    if (strcasecmp($locked, 'yes') != 0) {
+      $content = preg_replace("/\r\n|\r|\n/", "\r\n#", $content);
+    }
+    echo ($content);
   }
 } else {
+  $txt = preg_replace("/\r\n|\r|\n/", "\r\n#", $txt);
   echo ($txt);
 }
 ?>
@@ -130,7 +148,7 @@ if (isset($_GET['computer'])) {
 ?>
 ```
 
-The following sample `PHP` provides a remote reboot button for each detected computer.
+The following sample `PHP` provides remote actions for `reboot`, `lock`, `unlock` for detected computers. When locked, all steam domains in the `hosts` file will point to localhost and will not resolve correctly. When unlocked, all domain redirects will be commented out in the `hosts` file.
 
 `manage.php`
 ```
