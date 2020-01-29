@@ -54,6 +54,8 @@ The service can automatically stop named processes.
 
 The `HostsUri` configuration setting monitors the contents of a URL which controls the contents of the system `HOSTS` file.
 
+The `EndUri` configuration setting monitors the contents a URL which can end processes on the machine.
+
 The `RebootUri` configuration setting monitors the contents a URL which can reboot the machine.
 
 Sample `App.config`:
@@ -74,18 +76,26 @@ Sample `App.config`:
 
 ### Sample PHP JavaScript
 
+#### Hosts
+
 The following sample `PHP` allows the user to control hosts configurations per machine using the `?computer=` query parameter to select the contents that the service uses.
 
 [hosts.php](PHP/hosts.php)
+
+#### Reboot
 
 The following sample `PHP` can cause the service to reboot the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
 
 [reboot.php](PHP/reboot.php)
 
-The following sample `PHP` can cause the service to stop the list of processes on the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
+#### End
+
+The following sample `PHP` can cause the service to stop the list of processes on the computer when content is returned. The content has a list of process names (one per line). Any lines prefixed with `#` are commented out. After the content results are returned, the page goes back to returning empty results until `end` is toggled again.
 
 [end.php](PHP/end.php)
 
-The following sample `PHP` provides remote actions for `reboot`, `lock`, `unlock` for detected computers. When locked, all steam domains in the `hosts` file will point to localhost and will not resolve correctly. When unlocked, all domain redirects will be commented out in the `hosts` file.
+#### Manage
+
+The following sample `PHP` provides remote actions for `reboot`, `lock`, `unlock`, and `end` for detected computers. When locked, all steam domains in the `hosts` file will point to localhost and will not resolve correctly. When unlocked, all domain redirects will be commented out in the `hosts` file.
 
 [manage.php](PHP/manage.php)
