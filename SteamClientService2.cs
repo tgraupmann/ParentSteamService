@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.ServiceProcess;
@@ -74,6 +75,44 @@ namespace ParentSteamService
             }
         }
 
+        private void EndProcesses(string blob)
+        {
+            try
+            {
+                Process[] processes = Process.GetProcesses();
+                if (string.IsNullOrEmpty(blob))
+                {
+                    return;
+                }
+                string[] lines = blob.Split("\n".ToCharArray());
+                foreach (string line in lines)
+                {
+                    string l = line.Trim();
+                    if (string.IsNullOrEmpty(l))
+                    {
+                        continue;
+                    }
+                    // skip any commented out lines
+                    if (l.StartsWith("#"))
+                    {
+                        continue;
+                    }
+                    foreach (Process p in processes)
+                    {
+                        // stop any processes with the same name
+                        if (p.ProcessName.ToLower() == l.ToLower())
+                        {
+                            p.Kill();
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         private void ThreadWorker()
         {
             while (_mWaitForExit)
@@ -82,6 +121,28 @@ namespace ParentSteamService
                 if (!_mWaitForExit)
                 {
                     break;
+                }
+
+                // request the end URI to get processes that should end
+                try
+                {
+                    string url = ConfigurationSettings.AppSettings["EndUri"];
+                    string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
+                    Uri uri = new Uri(url + query);
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        {
+                            EndProcesses(sr.ReadToEnd());
+                        }
+                    }
+                    response.Close();
+                }
+                catch
+                {
+
                 }
 
                 // request the hosts URI to get hosts changes

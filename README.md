@@ -179,13 +179,17 @@ The following sample `PHP` can cause the service to stop the list of processes o
 
 header("Content-Type: text/plain");
 
+$txt = "#Steam Client
+steam
+";
+
 $computer = '';
 if (isset($_GET['computer'])) {
   $computer = $_GET['computer'];
   $file = 'end_' . basename($computer) . '.txt';
   if (!file_exists($file)) {
     $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
-    fwrite($myfile, $txt);
+    fwrite($myfile, 'no');
     fclose($myfile);
     // blank result
   } else {
@@ -201,7 +205,11 @@ if (isset($_GET['computer'])) {
       fclose($myfile);
 
       $file = 'processes_' . basename($computer) . '.txt';
-      if (file_exists($file)) {
+      if (!file_exists($file)) {
+        $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
+        fwrite($myfile, $txt);
+        fclose($myfile);
+      } else {
         $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
         $contents = fread($myfile,filesize($file));
         fclose($myfile);
