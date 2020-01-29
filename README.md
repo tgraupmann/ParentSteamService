@@ -20,6 +20,10 @@ Browsers typically need to be restarted after changing the HOSTS file, in order 
 
 ![image_5](images/image_5.png)
 
+`end.php`
+
+![image_7](images/image_7.png)
+
 ## Setup
 
 To install, open a Visual Studio Command Prompt.
@@ -42,6 +46,10 @@ When the service is running, the task manager will show a process `SteamServiceM
 
 ![image_2](images/image_2.png)
 
+The service can automatically stop named processes.
+
+![image_6](images/image_6.png)
+
 ## Configuration
 
 The `HostsUri` configuration setting monitors the contents of a URL which controls the contents of the system `HOSTS` file.
@@ -58,6 +66,7 @@ Sample `App.config`:
     </startup>
   <appSettings>
     <add key="HostsUri" value="https://[your_domain_here]/path/to/hosts.php" />
+    <add key="EndUri" value="https://[your_domain_here]/path/to/end.php" />
     <add key="RebootUri" value="https://[your_domain_here]/path/to/reboot.php" />
   </appSettings>
 </configuration>
@@ -129,7 +138,7 @@ The following sample `PHP` can cause the service to reboot the computer when `ye
 
 header("Content-Type: text/plain");
 
-$txt = "no";
+$txt = 'no';
 
 $computer = '';
 if (isset($_GET['computer'])) {
@@ -146,16 +155,60 @@ if (isset($_GET['computer'])) {
     $contents = fread($myfile,filesize($file));
     fclose($myfile);
 
+    if (strcasecmp($contents, 'yes') == 0) {
+      // reset file
+      $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
+      fwrite($myfile, $txt);
+      fclose($myfile);
+    }
+
     // print contents
     echo ($contents);
-
-    // reset file
-    $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
-    fwrite($myfile, $txt);
-    fclose($myfile);
   }
 } else {
   echo ($txt);
+}
+?>
+```
+
+The following sample `PHP` can cause the service to stop the list of processes on the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
+
+`end.php`
+```
+<?php
+
+header("Content-Type: text/plain");
+
+$computer = '';
+if (isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'end_' . basename($computer) . '.txt';
+  if (!file_exists($file)) {
+    $myfile = fopen($file, 'w') or die('Create: Unable to open file!');
+    fwrite($myfile, $txt);
+    fclose($myfile);
+    // blank result
+  } else {
+    // read file
+    $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+    $ready = fread($myfile,filesize($file));
+    fclose($myfile);
+
+    if (strcasecmp($ready, 'yes') == 0) {
+      // reset file
+      $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
+      fwrite($myfile, 'no');
+      fclose($myfile);
+
+      $file = 'processes_' . basename($computer) . '.txt';
+      if (file_exists($file)) {
+        $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+        $contents = fread($myfile,filesize($file));
+        fclose($myfile);
+        echo ($contents);
+      }
+    }
+  }
 }
 ?>
 ```
@@ -168,6 +221,9 @@ The following sample `PHP` provides remote actions for `reboot`, `lock`, `unlock
 <head>
 <title>Steam Service Management</title>
 <script>
+setTimeout(function() {
+  window.location.href = '?';
+}, 3000);
 function rebootComputer(computer) {
   if (confirm('Are you sure you want to reboot ' + computer + '?')) {
     if (confirm('Are you REALLY sure you want to reboot ' + computer + '?')) {
@@ -175,6 +231,13 @@ function rebootComputer(computer) {
     } else {
       window.location.href = '?';
     }
+  } else {
+    window.location.href = '?';
+  }
+}
+function endProcesses(computer) {
+  if (confirm('Are you sure you want to end processes on ' + computer + '?')) {
+    window.location.href = 'manage.php?action=end&computer=' + computer;
   } else {
     window.location.href = '?';
   }
@@ -208,6 +271,15 @@ if (strcasecmp($action, 'reboot') == 0 &&
   $computer = $_GET['computer'];
   $file = 'reboot_' . basename($computer) . '.txt';
   $myfile = fopen($file, 'w') or die('Create Reboot: Unable to open file!');
+  fwrite($myfile, 'yes');
+  fclose($myfile);
+}
+
+if (strcasecmp($action, 'end') == 0 &&
+  isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'end_' . basename($computer) . '.txt';
+  $myfile = fopen($file, 'w') or die('Create End: Unable to open file!');
   fwrite($myfile, 'yes');
   fclose($myfile);
 }
@@ -250,6 +322,11 @@ foreach (glob("contents_*.txt") as $filename) {
       echo ('<small style="color: #F00">rebooting...</small> <wbr/>');
     }
 
+    if (strcasecmp($action, 'end') == 0 &&
+      strcasecmp($computer, $entry) == 0) {
+      echo ('<small style="color: #F00">ending processes...</small> <wbr/>');
+    }
+
     if (strcasecmp($action, 'lock') == 0 &&
       strcasecmp($computer, $entry) == 0) {
       echo ('<small style="color: #F00">locking...</small> <wbr/>');
@@ -273,10 +350,12 @@ foreach (glob("contents_*.txt") as $filename) {
 
     echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button>');
 
+    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="endProcesses(\''. $entry .'\')">END PROCESSES on ' . strtoupper($entry) . '</button>');
+
     if (strcasecmp($locked, 'yes') == 0) {
-      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'unlock\', \''. $entry .'\')">UNLOCK ' . strtoupper($entry) . '</button>');
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'unlock\', \''. $entry .'\')">UNLOCK HOSTS on ' . strtoupper($entry) . '</button>');
     } else {
-      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'lock\', \''. $entry .'\')">LOCK ' . strtoupper($entry) . '</button>');
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'lock\', \''. $entry .'\')">LOCK HOSTS on ' . strtoupper($entry) . '</button>');
     }
 
     echo ('</div> <wbr/>');
