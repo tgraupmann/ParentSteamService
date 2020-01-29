@@ -1,10 +1,11 @@
 <html>
 <head>
 <title>Steam Service Management</title>
-<script>
+<script><?php if (isset($_GET['action'])) { ?>
 setTimeout(function() {
   window.location.href = '?';
 }, 3000);
+<?php } ?>
 function rebootComputer(computer) {
   if (confirm('Are you sure you want to reboot ' + computer + '?')) {
     if (confirm('Are you REALLY sure you want to reboot ' + computer + '?')) {
@@ -129,7 +130,19 @@ foreach (glob("contents_*.txt") as $filename) {
 
     echo ('<br/>');
 
-    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button>');
+    $rebooting = 'no';
+    $file = 'reboot_' . basename($computer) . '.txt';
+    if (file_exists($file)) {
+      // read file
+      $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
+      $rebooting = fread($myfile,filesize($file));
+      fclose($myfile);
+    }
+    if (strcasecmp($rebooting, 'yes') == 0) {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOTING ' . strtoupper($entry) . '</button>');
+    } else {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button>');
+    }
 
     echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="endProcesses(\''. $entry .'\')">END PROCESSES on ' . strtoupper($entry) . '</button>');
 
