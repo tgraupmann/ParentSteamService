@@ -17,6 +17,13 @@ function rebootComputer(computer) {
     window.location.href = '?';
   }
 }
+function getProcesses(computer) {
+  if (confirm('Are you sure you want to get processes on ' + computer + '?')) {
+    window.location.href = 'manage.php?action=get&computer=' + computer;
+  } else {
+    window.location.href = '?';
+  }
+}
 function endProcesses(computer) {
   if (confirm('Are you sure you want to end processes on ' + computer + '?')) {
     window.location.href = 'manage.php?action=end&computer=' + computer;
@@ -53,6 +60,15 @@ if (strcasecmp($action, 'reboot') == 0 &&
   $computer = $_GET['computer'];
   $file = 'reboot_' . basename($computer) . '.txt';
   $myfile = fopen($file, 'w') or die('Create Reboot: Unable to open file!');
+  fwrite($myfile, 'yes');
+  fclose($myfile);
+}
+
+if (strcasecmp($action, 'get') == 0 &&
+  isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'get_' . basename($computer) . '.txt';
+  $myfile = fopen($file, 'w') or die('Create Get: Unable to open file!');
   fwrite($myfile, 'yes');
   fclose($myfile);
 }
@@ -104,6 +120,11 @@ foreach (glob("contents_*.txt") as $filename) {
       echo ('<small style="color: #F00">rebooting...</small> <wbr/>');
     }
 
+    if (strcasecmp($action, 'get') == 0 &&
+      strcasecmp($computer, $entry) == 0) {
+      echo ('<small style="color: #F00">getting processes...</small> <wbr/>');
+    }
+
     if (strcasecmp($action, 'end') == 0 &&
       strcasecmp($computer, $entry) == 0) {
       echo ('<small style="color: #F00">ending processes...</small> <wbr/>');
@@ -143,6 +164,8 @@ foreach (glob("contents_*.txt") as $filename) {
     } else {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button>');
     }
+
+    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="getProcesses(\''. $entry .'\')">GET PROCESSES on ' . strtoupper($entry) . '</button>');
 
     echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="endProcesses(\''. $entry .'\')">END PROCESSES on ' . strtoupper($entry) . '</button>');
 
