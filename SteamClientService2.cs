@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.ServiceProcess;
+using System.Text;
 using System.Threading;
 using System.Web;
 
@@ -75,6 +77,68 @@ namespace ParentSteamService
             }
         }
 
+        private void PostProcesses()
+        {
+            try
+            {
+                SortedList<string, bool> processList = new SortedList<string, bool>();
+                Process[] processes = Process.GetProcesses();                
+                foreach (Process p in processes)
+                {
+                    string processName = p.ProcessName;
+                    if (string.IsNullOrEmpty(processName))
+                    {
+                        continue;
+                    }
+                    processName = processName.ToLower().Trim();
+                    if (!processList.ContainsKey(processName))
+                    {
+                        processList.Add(processName, false);
+                    }
+                }
+
+                // request the get URI to post running processes
+                try
+                {
+                    string url = ConfigurationSettings.AppSettings["PostUri"];
+                    string data = "computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
+                    data += "&data=";
+                    foreach (KeyValuePair<string, bool> kvp in processList)
+                    {
+                        string process = kvp.Key;
+                        data += HttpUtility.UrlEncode(process + Environment.NewLine);
+                    }
+                    byte[] byteArray = Encoding.UTF8.GetBytes(data);
+                    Uri uri = new Uri(url);
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Method = "POST";
+                    request.ContentType = "application/x-www-form-urlencoded";
+                    request.ContentLength = byteArray.Length;
+                    using (Stream webpageStream = request.GetRequestStream())
+                    {
+                        webpageStream.Write(byteArray, 0, byteArray.Length);
+                    }
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        {
+                            PostProcesses();
+                        }
+                    }
+                    response.Close();
+                }
+                catch
+                {
+
+                }
+            }
+            catch (Exception)
+            {
+
+            }
+        }
+
         private void EndProcesses(string blob)
         {
             try
@@ -99,8 +163,14 @@ namespace ParentSteamService
                     }
                     foreach (Process p in processes)
                     {
+                        string processName = p.ProcessName;
+                        if (string.IsNullOrEmpty(processName))
+                        {
+                            continue;
+                        }
+                        processName = processName.ToLower().Trim();
                         // stop any processes with the same name
-                        if (p.ProcessName.ToLower() == l.ToLower())
+                        if (processName == l.ToLower())
                         {
                             p.Kill();
                         }
@@ -121,6 +191,28 @@ namespace ParentSteamService
                 if (!_mWaitForExit)
                 {
                     break;
+                }
+
+                // request the get URI to post running processes
+                try
+                {
+                    string url = ConfigurationSettings.AppSettings["GetUri"];
+                    string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
+                    Uri uri = new Uri(url + query);
+                    HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                        {
+                            PostProcesses();
+                        }
+                    }
+                    response.Close();
+                }
+                catch
+                {
+
                 }
 
                 // request the end URI to get processes that should end
