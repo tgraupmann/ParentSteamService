@@ -3,7 +3,7 @@
 header("Content-Type: text/plain");
 
 $txt = "#Steam Client
-steam
+c:\program files (x86)\steam\steam.exe
 ";
 
 $computer = '';

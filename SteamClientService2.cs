@@ -77,6 +77,20 @@ namespace ParentSteamService
             }
         }
 
+        private string GetProcessName(Process process)
+        {
+            string processName = process.ProcessName;
+            try
+            {
+                processName = process.MainModule.FileName;
+            }
+            catch
+            {
+
+            }
+            return processName;
+        }
+
         private void PostProcesses()
         {
             try
@@ -85,7 +99,7 @@ namespace ParentSteamService
                 Process[] processes = Process.GetProcesses();                
                 foreach (Process p in processes)
                 {
-                    string processName = p.ProcessName;
+                    string processName = GetProcessName(p);
                     if (string.IsNullOrEmpty(processName))
                     {
                         continue;
@@ -163,7 +177,7 @@ namespace ParentSteamService
                     }
                     foreach (Process p in processes)
                     {
-                        string processName = p.ProcessName;
+                        string processName = GetProcessName(p);
                         if (string.IsNullOrEmpty(processName))
                         {
                             continue;
