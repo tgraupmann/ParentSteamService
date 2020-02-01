@@ -125,6 +125,7 @@ namespace ParentSteamService
                     byte[] byteArray = Encoding.UTF8.GetBytes(data);
                     Uri uri = new Uri(url);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Timeout = 1000;
                     request.Method = "POST";
                     request.ContentType = "application/x-www-form-urlencoded";
                     request.ContentLength = byteArray.Length;
@@ -135,16 +136,12 @@ namespace ParentSteamService
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
-                        using (StreamReader sr = new StreamReader(response.GetResponseStream()))
-                        {
-                            PostProcesses();
-                        }
                     }
                     response.Close();
                 }
-                catch
+                catch (Exception ex)
                 {
-
+                    Console.Error.WriteLine("Failed to post exception: {0}", ex);
                 }
             }
             catch (Exception)
@@ -214,12 +211,16 @@ namespace ParentSteamService
                     string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
                     Uri uri = new Uri(url + query);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Timeout = 1000;
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
                         using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                         {
-                            PostProcesses();
+                            if (sr.ReadToEnd().Trim().ToLower() == "yes")
+                            {
+                                PostProcesses();
+                            }
                         }
                     }
                     response.Close();
@@ -236,6 +237,7 @@ namespace ParentSteamService
                     string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
                     Uri uri = new Uri(url + query);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Timeout = 1000;
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
@@ -259,6 +261,7 @@ namespace ParentSteamService
                     string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
                     Uri uri = new Uri(url + query);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Timeout = 1000;
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
@@ -312,6 +315,7 @@ namespace ParentSteamService
                     string query = "?computer=" + HttpUtility.UrlEncode(Environment.MachineName).ToLower();
                     Uri uri = new Uri(url + query);
                     HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(uri);
+                    request.Timeout = 1000;
                     HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
