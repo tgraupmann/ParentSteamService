@@ -183,7 +183,14 @@ namespace ParentSteamService
                         // stop any processes with the same name
                         if (processName == l.ToLower())
                         {
-                            p.Kill();
+                            try
+                            {
+                                p.Kill();
+                            }
+                            catch (Exception)
+                            {
+
+                            }
                         }
                     }
                 }
