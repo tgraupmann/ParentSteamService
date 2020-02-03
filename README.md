@@ -46,7 +46,7 @@ When the service is running, the task manager will show a process `SteamServiceM
 
 ![image_2](images/image_2.png)
 
-The service can automatically stop named processes.
+The service can automatically block named processes.
 
 ![image_6](images/image_6.png)
 
@@ -54,11 +54,15 @@ The service can automatically stop named processes.
 
 The `HostsUri` configuration setting monitors the contents of a URL which controls the contents of the system `HOSTS` file.
 
+The `GetUri` configuration setting monitors for a request to query processes on the machine.
+
+The `PostUri` configuration setting is the destination from the query for processes on the machine.
+
 The `EndUri` configuration setting monitors the contents a URL which can end processes on the machine.
 
 The `RebootUri` configuration setting monitors the contents a URL which can reboot the machine.
 
-Sample [App.config](App.config):
+* Sample [App.config](App.config)
 
 ### Sample PHP JavaScript
 
@@ -74,9 +78,21 @@ The following sample `PHP` can cause the service to reboot the computer when `ye
 
 [reboot.php](PHP/reboot.php)
 
+#### Get
+
+The following sample `PHP` can cause the service to query for processes running on the computer when `yes` is returned. After returning `yes` the file reverts to `no`.
+
+[get.php](PHP/get.php)
+
+### Post
+
+The following sample `PHP` saves the data that was queried in the `get` operation.
+
+[post.php](PHP/post.php)
+
 #### End
 
-The following sample `PHP` can cause the service to stop the list of processes on the computer when content is returned. The content has a list of process names (one per line). Any lines prefixed with `#` are commented out. After the content results are returned, the page goes back to returning empty results until `end` is toggled again.
+The following sample `PHP` can cause the service to stop the list of processes on the computer when content is returned. The content has a list of process names (one per line). Any lines prefixed with `#` are commented out. The list is returned when games are blocked. The list is block when games are unblocked.
 
 [end.php](PHP/end.php)
 
