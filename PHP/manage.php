@@ -1,4 +1,41 @@
-<html>
+<?php
+$cookie_name = "steamservicemgmt";
+$cookie_value = "1337";
+$proceed = false;
+if (!isset($_COOKIE[$cookie_name])) {
+  $user = '';
+  if (isset($_POST['user'])) {
+    $user = $_POST['user'];
+  }
+  $pass = '';
+  if (isset($_POST['pass'])) {
+    $pass = $_POST['pass'];
+  }
+
+  if($user == "parent" && $pass == "password") {
+    $proceed = true;
+    setcookie($cookie_name, $cookie_value, time() + (86400 * 30), "/"); // 86400 = 1 day
+  }
+} else {
+  $proceed = true;
+}
+
+if ($proceed == false) {
+  //echo "Cookie named '" . $cookie_name . "' is not set!";
+  ?>
+  <div class="divText">Authentication is required to proceed.</div><br/>
+  <br/>
+  <form method="POST" action="">
+  <div class="divText">Username:</div>&nbsp;<input type="text" name="user"></input><br/>
+  <br/>
+  <div class="divText">Password:</div>&nbsp;<input type="password" name="pass"></input><br/>
+  <br/>
+  <input type="submit" name="submit" value="Submit"></input>
+  </form>
+  <?php
+
+  exit();
+} ?><html>
 <head>
 <title>Steam Service Management</title>
 <script><?php if (isset($_GET['action'])) { ?>
