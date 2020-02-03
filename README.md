@@ -8,21 +8,13 @@ The service checks a URL for hosts changes on an interval. When a change is dete
 
 Browsers typically need to be restarted after changing the HOSTS file, in order to take effect.
 
+### Management Web Console
+
 `manage.php`
 
+The web console shows all the machines connected to the service and has a simple user interface to perform actions on the monitored computers. The web console has a protected login and then each operation has a confirm prompt to make sure actions are intentional.
+
 ![image_3](images/image_3.png)
-
-`hosts.php`
-
-![image_4](images/image_4.png)
-
-`reboot.php`
-
-![image_5](images/image_5.png)
-
-`end.php`
-
-![image_7](images/image_7.png)
 
 ## Setup
 
