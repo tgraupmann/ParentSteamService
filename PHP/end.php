@@ -3,7 +3,16 @@
 header("Content-Type: text/plain");
 
 $txt = "#Steam Client
-c:\program files (x86)\steam\steam.exe
+#steam
+
+#Rust
+rustclient
+
+#Discord
+c:\users\devin\appdata\local\discord\app-0.0.305\discord.exe
+
+#Escape from Tarkov
+escapefromtarkov
 ";
 
 $computer = '';
@@ -22,11 +31,6 @@ if (isset($_GET['computer'])) {
     fclose($myfile);
 
     if (strcasecmp($ready, 'yes') == 0) {
-      // reset file
-      $myfile = fopen($file, 'w') or die('Reset: Unable to open file!');
-      fwrite($myfile, 'no');
-      fclose($myfile);
-
       $file = 'processes_' . basename($computer) . '.txt';
       if (!file_exists($file)) {
         $myfile = fopen($file, 'w') or die('Create: Unable to open file!');

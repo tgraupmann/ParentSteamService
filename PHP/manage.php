@@ -43,6 +43,32 @@ setTimeout(function() {
   window.location.href = '?';
 }, 3000);
 <?php } ?>
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return "";
+}
+function setCookie(cname, cvalue, exMins) {
+    var d = new Date();
+    d.setTime(d.getTime() + (exMins*60*1000));
+    var expires = "expires="+d.toUTCString();
+    document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
+function logout() {
+  setCookie('<?php echo ($cookie_name) ?>', '', 0);
+  //console.log('cookie', getCookie('<?php echo ($cookie_name) ?>'));
+  window.location.href = '?';
+}
 function rebootComputer(computer) {
   if (confirm('Are you sure you want to reboot ' + computer + '?')) {
     if (confirm('Are you REALLY sure you want to reboot ' + computer + '?')) {
@@ -61,9 +87,16 @@ function getProcesses(computer) {
     window.location.href = '?';
   }
 }
-function endProcesses(computer) {
-  if (confirm('Are you sure you want to end processes on ' + computer + '?')) {
-    window.location.href = 'manage.php?action=end&computer=' + computer;
+function blockProcesses(computer) {
+  if (confirm('Are you sure you want to block processes on ' + computer + '?')) {
+    window.location.href = 'manage.php?action=block&computer=' + computer;
+  } else {
+    window.location.href = '?';
+  }
+}
+function unblockProcesses(computer) {
+  if (confirm('Are you sure you want to unblock processes on ' + computer + '?')) {
+    window.location.href = 'manage.php?action=unblock&computer=' + computer;
   } else {
     window.location.href = '?';
   }
@@ -78,7 +111,10 @@ function lockComputer(action, computer) {
 </script>
 </head>
 
-<h1><a href="?">Steam Service Management</a></h1>
+<div>
+  <a href="?" style="font-size: 2em; padding: 100px">Steam Service Management</a>
+  <button style="width: 150px; height: 60px;" onclick="logout()">LOG OUT</button>
+</div>
 
 <?php
 
@@ -110,12 +146,21 @@ if (strcasecmp($action, 'get') == 0 &&
   fclose($myfile);
 }
 
-if (strcasecmp($action, 'end') == 0 &&
+if (strcasecmp($action, 'block') == 0 &&
   isset($_GET['computer'])) {
   $computer = $_GET['computer'];
   $file = 'end_' . basename($computer) . '.txt';
   $myfile = fopen($file, 'w') or die('Create End: Unable to open file!');
   fwrite($myfile, 'yes');
+  fclose($myfile);
+}
+
+if (strcasecmp($action, 'unblock') == 0 &&
+  isset($_GET['computer'])) {
+  $computer = $_GET['computer'];
+  $file = 'end_' . basename($computer) . '.txt';
+  $myfile = fopen($file, 'w') or die('Create End: Unable to open file!');
+  fwrite($myfile, 'no');
   fclose($myfile);
 }
 
@@ -204,7 +249,19 @@ foreach (glob("contents_*.txt") as $filename) {
 
     echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="getProcesses(\''. $entry .'\')">GET PROCESSES on ' . strtoupper($entry) . '</button>');
 
-    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="endProcesses(\''. $entry .'\')">END PROCESSES on ' . strtoupper($entry) . '</button>');
+    $file = 'end_' . basename($entry) . '.txt';
+    $blocked = 'no';
+    if (file_exists($file)) {
+      // read file
+      $myfile = fopen($file, 'r') or die('End: Unable to open file!');
+      $blocked = fread($myfile,filesize($file));
+      fclose($myfile);
+    }
+    if (strcasecmp($blocked, 'yes') == 0) {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="unblockProcesses(\''. $entry .'\')">UNBLOCK GAMES on ' . strtoupper($entry) . '</button>');
+    } else {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="blockProcesses(\''. $entry .'\')">BLOCK GAMES on ' . strtoupper($entry) . '</button>');
+    }
 
     if (strcasecmp($locked, 'yes') == 0) {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'unlock\', \''. $entry .'\')">UNLOCK HOSTS on ' . strtoupper($entry) . '</button>');
