@@ -3,16 +3,19 @@
 header("Content-Type: text/plain");
 
 $txt = "#Steam Client
-#steam
-
-#Rust
-rustclient
+steam
 
 #Discord
 c:\users\devin\appdata\local\discord\app-0.0.305\discord.exe
 
+#Rust
+rustclient
+
 #Escape from Tarkov
 escapefromtarkov
+
+#Task Manager
+taskmgr
 ";
 
 $computer = '';
