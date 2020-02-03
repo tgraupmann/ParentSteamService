@@ -58,21 +58,7 @@ The `EndUri` configuration setting monitors the contents a URL which can end pro
 
 The `RebootUri` configuration setting monitors the contents a URL which can reboot the machine.
 
-Sample `App.config`:
-
-```
-<?xml version="1.0" encoding="utf-8" ?>
-<configuration>
-    <startup>
-        <supportedRuntime version="v4.0" sku=".NETFramework,Version=v4.8" />
-    </startup>
-  <appSettings>
-    <add key="HostsUri" value="https://[your_domain_here]/path/to/hosts.php" />
-    <add key="EndUri" value="https://[your_domain_here]/path/to/end.php" />
-    <add key="RebootUri" value="https://[your_domain_here]/path/to/reboot.php" />
-  </appSettings>
-</configuration>
-```
+Sample [App.config](App.config):
 
 ### Sample PHP JavaScript
 
