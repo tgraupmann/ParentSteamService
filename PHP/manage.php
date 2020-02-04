@@ -247,7 +247,19 @@ foreach (glob("contents_*.txt") as $filename) {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="rebootComputer(\''. $entry .'\')">REBOOT ' . strtoupper($entry) . '</button>');
     }
 
-    echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="getProcesses(\''. $entry .'\')">GET PROCESSES on ' . strtoupper($entry) . '</button>');
+    $file = 'get_' . basename($entry) . '.txt';
+    $getting = 'no';
+    if (file_exists($file)) {
+      // read file
+      $myfile = fopen($file, 'r') or die('End: Unable to open file!');
+      $getting = fread($myfile,filesize($file));
+      fclose($myfile);
+    }
+    if (strcasecmp($getting, 'yes') == 0) {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="getProcesses(\''. $entry .'\')">GETTING PROCESSES on ' . strtoupper($entry) . '</button>');
+    } else {
+      echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="getProcesses(\''. $entry .'\')">GET PROCESSES on ' . strtoupper($entry) . '</button>');
+    }
 
     $file = 'end_' . basename($entry) . '.txt';
     $blocked = 'no';
