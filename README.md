@@ -54,6 +54,41 @@ The `EndUri` configuration setting monitors the contents a URL which can end pro
 
 The `RebootUri` configuration setting monitors the contents a URL which can reboot the machine.
 
+### Processes
+
+Here are some common game processes that can be blocked.
+
+These entries go into the `processes_machinename.txt` file.
+
+```
+#Task Manager
+taskmgr
+
+#Steam Client
+steam
+
+#Rust
+rustclient
+
+#Escape from Tarkov
+escapefromtarkov
+
+#Minecraft
+c:\program files (x86)\minecraft launcher\minecraftlauncher.exe
+
+#Payday 2
+c:\program files (x86)\steam\steamapps\common\payday 2\payday2_win32_release.exe
+
+#New Frontier
+newfrontier
+
+#Steep
+steep
+
+#Apex Legends
+r5apex
+```
+
 * Sample [App.config](App.config)
 
 ### Sample PHP JavaScript
@@ -76,7 +111,7 @@ The following sample `PHP` can cause the service to query for processes running 
 
 [get.php](PHP/get.php)
 
-### Post
+#### Post
 
 The following sample `PHP` saves the data that was queried in the `get` operation.
 
