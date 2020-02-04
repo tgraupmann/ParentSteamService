@@ -234,7 +234,7 @@ foreach (glob("contents_*.txt") as $filename) {
     echo ('<br/>');
 
     $rebooting = 'no';
-    $file = 'reboot_' . basename($computer) . '.txt';
+    $file = 'reboot_' . basename($entry) . '.txt';
     if (file_exists($file)) {
       // read file
       $myfile = fopen($file, 'r') or die('Read: Unable to open file!');
