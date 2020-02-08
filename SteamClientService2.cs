@@ -295,7 +295,7 @@ namespace ParentSteamService
                         using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                         {
                             processes = sr.ReadToEnd();
-                            if (!string.IsNullOrEmpty(processes))
+                            if (processes != null)
                             {
                                 // Save the processes in the cache in case of airplane mode
                                 SetSetting(KEY_CACHE_SETTING_END, processes);
