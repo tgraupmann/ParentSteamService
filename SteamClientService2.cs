@@ -50,6 +50,47 @@ namespace ParentSteamService
             InitializeComponent();
         }
 
+        static string GetSetting(string key, string defValue)
+        {
+            try
+            {
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+                if (settings[key] != null)
+                {
+                    return settings[key].Value;
+                }
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error reading app settings");
+            }
+            return defValue;
+        }
+
+        static void SetSetting(string key, string value)
+        {
+            try
+            {
+                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
+                var settings = configFile.AppSettings.Settings;
+                if (settings[key] == null)
+                {
+                    settings.Add(key, value);
+                }
+                else
+                {
+                    settings[key].Value = value;
+                }
+                configFile.Save(ConfigurationSaveMode.Modified);
+                ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+            }
+            catch (ConfigurationErrorsException)
+            {
+                Console.WriteLine("Error writing app settings");
+            }
+        }
+
         protected override void OnStart(string[] args)
         {
             _mWaitForExit = true;
@@ -201,6 +242,8 @@ namespace ParentSteamService
             }
         }
 
+        private const string KEY_CACHE_SETTING_END = "KEY_CACHE_SETTING_END";
+
         private void ThreadWorker()
         {
             while (_mWaitForExit)
@@ -238,6 +281,7 @@ namespace ParentSteamService
                 }
 
                 // request the end URI to get processes that should end
+                string processes = null;
                 try
                 {
                     string url = ConfigurationSettings.AppSettings["EndUri"];
@@ -250,10 +294,37 @@ namespace ParentSteamService
                     {
                         using (StreamReader sr = new StreamReader(response.GetResponseStream()))
                         {
-                            EndProcesses(sr.ReadToEnd());
+                            processes = sr.ReadToEnd();
+                            if (!string.IsNullOrEmpty(processes))
+                            {
+                                // Save the processes in the cache in case of airplane mode
+                                SetSetting(KEY_CACHE_SETTING_END, processes);
+                            }
                         }
                     }
                     response.Close();
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    if (null == processes)
+                    {
+                        processes = GetSetting(KEY_CACHE_SETTING_END, string.Empty);
+                    }
+                }
+                catch
+                {
+                }
+
+                try
+                {
+                    if (!string.IsNullOrEmpty(processes))
+                    {
+                        EndProcesses(processes);
+                    }
                 }
                 catch
                 {

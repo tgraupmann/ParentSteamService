@@ -269,11 +269,14 @@ foreach (glob("contents_*.txt") as $filename) {
       $blocked = fread($myfile,filesize($file));
       fclose($myfile);
     }
+    echo ('<div style="border: solid black;">');
+    echo ('<a target="_blank" href="processes_' . basename($entry) . '.txt">Monitored processes</a>');
     if (strcasecmp($blocked, 'yes') == 0) {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="unblockProcesses(\''. $entry .'\')">UNBLOCK GAMES on ' . strtoupper($entry) . '</button>');
     } else {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="blockProcesses(\''. $entry .'\')">BLOCK GAMES on ' . strtoupper($entry) . '</button>');
     }
+    echo ('</div>');
 
     if (strcasecmp($locked, 'yes') == 0) {
       echo ('<button style="width: 250px; height: 60px; padding:5px; margin:10px;" onclick="lockComputer(\'unlock\', \''. $entry .'\')">UNLOCK HOSTS on ' . strtoupper($entry) . '</button>');
